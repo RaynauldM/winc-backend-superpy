@@ -1,7 +1,7 @@
 # Imports
-import argparse
-import csv
-from datetime import date
+from argparse_functions import *
+from csv_functions import *
+from datetime_functions import *
 
 # my own imports
 
@@ -16,7 +16,7 @@ __human_name__ = "superpy"
 
 
 def main():
-    pass
+    startArg()
 
 
 if __name__ == "__main__":
