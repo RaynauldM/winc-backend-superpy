@@ -1,5 +1,6 @@
 import argparse
 import sys
+from csv_functions import SuperCsv
 
 choice_help_message = """
 [buy] buy produce,\n
@@ -78,6 +79,7 @@ class ArgParse:
             f"You want to buy a {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date},\n please enter [y] or [yes] if correct\n"
         )
         if yes_no_input == "yes" or yes_no_input == "y":
+            SuperCsv().add_bought(self.product_name, self.price, self.expiration_date)
             print("ok, written to the harddrive.")
         else:
             input("No data saved. Press enter to exit")
@@ -95,6 +97,7 @@ class ArgParse:
         self.advance_time = args.advance_time
 
         # work with the arguments
+        # choice was [buy]
         if self.choice == "buy":
             self.product_name = self.checkArgument(self.product_name, "product name")
             self.price = self.checkArgument(self.price, "price")
