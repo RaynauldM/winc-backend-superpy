@@ -1,12 +1,19 @@
 import argparse
 import sys
 from csv_functions import SuperCsv
+from datetime_functions import SuperDatetime
 
 choice_help_message = """
 [buy] buy produce,\n
 [sell] sell produce,\n
 [report] show inventory\n
 """
+
+symbols = [
+    chr(i)
+    for i in range(32, 127)
+    if not chr(i).isdigit() and chr(i) != "." and chr(i) != "-"
+]
 
 
 class ArgParse:
@@ -34,7 +41,6 @@ class ArgParse:
         self.parser.add_argument(
             "-pn",
             "--product-name",
-            type=str,
             help="name of the product to be bought in single form",
         )
         self.parser.add_argument(
@@ -44,7 +50,7 @@ class ArgParse:
         self.parser.add_argument(
             "-ed",
             "--expiration_date",
-            help="set the expiration date for the product to buy, in the format [yy] to set only year or [yyyy-mm-dd] to be specific",
+            help="set the expiration date for the product to buy, in the format [yyyy] to set only year or [yyyy-mm] to set year and month",
         )
 
         self.parser.add_argument("--now", action="store_true")
@@ -66,6 +72,8 @@ class ArgParse:
         self.expiration_date = -99
         self.advance_time = "default"
 
+        self.this_date = SuperDatetime()
+
     def checkArgument(self, var, string):
         if var is None or var == "":
             var = input(f"Please enter a {string}:\n")
@@ -76,14 +84,37 @@ class ArgParse:
 
     def conformation(self):
         yes_no_input = input(
-            f"You want to buy a {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date},\n please enter [y] or [yes] if correct\n"
+            f"On the date: {self.this_date.get_datetime()}\n you want to buy a {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date},\n please enter [y] or [yes] if correct\n"
         )
         if yes_no_input == "yes" or yes_no_input == "y":
-            SuperCsv().add_bought(self.product_name, self.price, self.expiration_date)
+            SuperCsv().add_bought(
+                self.product_name,
+                self.this_date.get_datetime(),
+                self.price,
+                self.expiration_date,
+            )
             print("ok, written to the harddrive.")
         else:
             input("No data saved. Press enter to exit")
             sys.exit()
+
+    def default_error_message(self):
+        print("Error, please try again")
+        input("")
+        sys.exit()
+
+    def check_product_name(self):
+        pn = self.product_name
+        plist = list(pn)
+        if len(pn) == 0 or len(pn) > 20 or " " in plist:
+            self.default_error_message()
+
+    def check_if_int(self, price_or_expiration_date):
+        val = price_or_expiration_date
+        li = list(val)
+        for i in li:
+            if i in symbols:
+                self.default_error_message()
 
     def run(self):
         args = self.parser.parse_args()
@@ -99,9 +130,14 @@ class ArgParse:
         # work with the arguments
         # choice was [buy]
         if self.choice == "buy":
-            self.product_name = self.checkArgument(self.product_name, "product name")
-            self.price = self.checkArgument(self.price, "price")
-            self.expiration_date = self.checkArgument(
-                self.expiration_date, "expiration date"
+            self.product_name = self.checkArgument(
+                self.product_name, "product name with underscore between words"
             )
+            self.check_product_name()
+            self.price = self.checkArgument(self.price, "price")
+            self.check_if_int(self.price)
+            self.expiration_date = self.checkArgument(
+                self.expiration_date, "expiration date [yyyy] or [yyyy-mm]"
+            )
+            self.check_if_int(self.expiration_date)
             self.conformation()

@@ -1,2 +1,7 @@
 id,product_name,buy_date,buy_price,expiration_date
-2,gras,today,90,78
+1,soep,2023-6-14,75,28
+2,koek,2023-6-14,31,12
+3,beer,2023-6-14,ik,op
+4,kaas,2023-6-14,8,98
+5,kaas_en_ham,2023-6-14,6,89
+6,uienringen,2023-6-14,7.50,2023-12
