@@ -4,11 +4,12 @@ from csv_functions import SuperCsv
 from datetime_functions import SuperDatetime
 
 choice_help_message = """
-[buy] buy produce,\n
-[sell] sell produce,\n
+[buy] buy product,\n
+[sell] sell product,\n
 [report] show inventory\n
 """
 
+# list to check if a string only contains numbers, dots and dash in the check_if_int method
 symbols = [
     chr(i)
     for i in range(32, 127)
@@ -19,7 +20,7 @@ symbols = [
 class ArgParse:
     def __init__(self):
         self.parser = argparse.ArgumentParser(
-            description="A program to help a supermarket keep track of produce bought and sold"
+            description="A program to help a supermarket keep track of products bought and sold"
         )
 
         # first positional argument, to be ommited to change the datetime
@@ -43,8 +44,12 @@ class ArgParse:
             "--product-name",
             help="name of the product to be bought in single form",
         )
+
         self.parser.add_argument(
-            "-p", "--price", help="set the price for the product to buy", type=int
+            "-c", "--count", help="Set the amount of the product to buy"
+        )
+        self.parser.add_argument(
+            "-p", "--price", help="set the price for the product to buy"
         )
 
         self.parser.add_argument(
@@ -65,9 +70,11 @@ class ArgParse:
         )
 
         self.parser.add_argument("-at", "--advance_time", type=int)
+
         self.choice = "default"
         self.report_choice = "default"
         self.product_name = "default"
+        self.count = -99
         self.price = -99
         self.expiration_date = -99
         self.advance_time = "default"
@@ -78,17 +85,18 @@ class ArgParse:
         if var is None or var == "":
             var = input(f"Please enter a {string}:\n")
         if var is None or var == "":
-            input("Sorry, could not compute. Press enter to exit the programme")
+            input("Sorry, could not compute. Press enter to exit the program")
             sys.exit()
         return var
 
     def conformation(self):
         yes_no_input = input(
-            f"On the date: {self.this_date.get_datetime()}\n you want to buy a {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date},\n please enter [y] or [yes] if correct\n"
+            f"On the date: {self.this_date.get_datetime()}\n you want to buy {self.count} {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date}\n please enter [y] or [yes] if correct\n"
         )
         if yes_no_input == "yes" or yes_no_input == "y":
             SuperCsv().add_bought(
                 self.product_name,
+                self.count,
                 self.this_date.get_datetime(),
                 self.price,
                 self.expiration_date,
@@ -98,8 +106,8 @@ class ArgParse:
             input("No data saved. Press enter to exit")
             sys.exit()
 
-    def default_error_message(self):
-        print("Error, please try again")
+    def default_error_message(self, text="Error, something went wrong"):
+        print(text + "\nplease try again")
         input("")
         sys.exit()
 
@@ -107,14 +115,31 @@ class ArgParse:
         pn = self.product_name
         plist = list(pn)
         if len(pn) == 0 or len(pn) > 20 or " " in plist:
-            self.default_error_message()
+            self.default_error_message("Invalid product name")
 
-    def check_if_int(self, price_or_expiration_date):
-        val = price_or_expiration_date
-        li = list(val)
+    def check_if_int(self, obj):
+        li = list(obj)
         for i in li:
             if i in symbols:
-                self.default_error_message()
+                self.default_error_message("only numbers allowed")
+
+    def check_expiration_date(self):
+        ex_list = list(self.expiration_date)
+        expiration_year = ex_list[0] + ex_list[1] + ex_list[2] + ex_list[3]
+        this_year = self.this_date.get_year()
+        if int(expiration_year) < int(this_year):
+            self.default_error_message("expiration year has already passed")
+        if len(self.expiration_date) == 4:
+            self.expiration_date += "-01"
+        elif "-" not in self.expiration_date:
+            self.default_error_message("please input the date as [yyyy] or [yyyy-mm]")
+        elif "-" in self.expiration_date:
+            month = ""
+            month += ex_list[-2]
+            month += ex_list[-1]
+            month = int(month)
+            if month > 12:
+                self.default_error_message("months can not exceed 12")
 
     def run(self):
         args = self.parser.parse_args()
@@ -123,6 +148,7 @@ class ArgParse:
         self.choice = args.choice
         self.report_choice = args.report_choice
         self.product_name = args.product_name
+        self.count = args.count
         self.price = args.price
         self.expiration_date = args.expiration_date
         self.advance_time = args.advance_time
@@ -134,10 +160,16 @@ class ArgParse:
                 self.product_name, "product name with underscore between words"
             )
             self.check_product_name()
+            self.count = self.checkArgument(
+                self.count, f"number of how many of {self.product_name} will be bought"
+            )
+            self.check_if_int(self.count)
             self.price = self.checkArgument(self.price, "price")
             self.check_if_int(self.price)
             self.expiration_date = self.checkArgument(
                 self.expiration_date, "expiration date [yyyy] or [yyyy-mm]"
             )
+
             self.check_if_int(self.expiration_date)
+            self.check_expiration_date()
             self.conformation()

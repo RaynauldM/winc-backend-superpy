@@ -8,3 +8,6 @@ class SuperDatetime:
 
     def get_datetime(self):
         return f"{self.dt.year}-{self.dt.month}-{self.dt.day}"
+
+    def get_year(self):
+        return self.dt.year

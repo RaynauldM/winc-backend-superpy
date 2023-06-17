@@ -1,7 +1,9 @@
-id,product_name,buy_date,buy_price,expiration_date
-1,soep,2023-6-14,75,28
-2,koek,2023-6-14,31,12
-3,beer,2023-6-14,ik,op
-4,kaas,2023-6-14,8,98
-5,kaas_en_ham,2023-6-14,6,89
-6,uienringen,2023-6-14,7.50,2023-12
+id,product_name,count,buy_date,buy_price,expiration_date
+
+1,smeerkaas,16,2023-6-17,88,2024-10
+2,uien,7,2023-6-17,70,2022-01
+3,poepkaas,8,2023-6-17,3.50,2024-5
+4,20,20,2023-6-17,20,2020-02
+5,kaashammert,9,2023-6-17,3.50,2020-01
+6,Hoefijzers,2,2023-6-17,70,2020-01
+7,Hoefijzers,2,2023-6-17,70,2024-06
