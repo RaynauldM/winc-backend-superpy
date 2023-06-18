@@ -1,1 +1,2 @@
-id,bought_id,sell_date,sell_price
+id,bought_id,count,sell_date,sell_price
+0,0,3,2023-6-18,80

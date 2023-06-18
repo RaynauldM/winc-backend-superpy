@@ -1,9 +1,2 @@
-id,product_name,count,buy_date,buy_price,expiration_date
-
-1,smeerkaas,16,2023-6-17,88,2024-10
-2,uien,7,2023-6-17,70,2022-01
-3,poepkaas,8,2023-6-17,3.50,2024-5
-4,20,20,2023-6-17,20,2020-02
-5,kaashammert,9,2023-6-17,3.50,2020-01
-6,Hoefijzers,2,2023-6-17,70,2020-01
-7,Hoefijzers,2,2023-6-17,70,2024-06
+id,product_name,count,buy_date,buy_price,expiration_date
+0,uien,3,2023-6-18,90,2025-01

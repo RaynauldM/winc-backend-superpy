@@ -89,22 +89,53 @@ class ArgParse:
             sys.exit()
         return var
 
-    def conformation(self):
-        yes_no_input = input(
-            f"On the date: {self.this_date.get_datetime()}\n you want to buy {self.count} {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date}\n please enter [y] or [yes] if correct\n"
-        )
-        if yes_no_input == "yes" or yes_no_input == "y":
-            SuperCsv().add_bought(
-                self.product_name,
-                self.count,
-                self.this_date.get_datetime(),
-                self.price,
-                self.expiration_date,
+    def conformation(self, buy_or_sell):
+        if buy_or_sell == "buy":
+            yes_input = input(
+                f"On the date: {self.this_date.get_datetime()}\n you want to buy {self.count} {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date}\n please enter [y] or [yes] if correct\n"
             )
-            print("ok, written to the harddrive.")
-        else:
-            input("No data saved. Press enter to exit")
-            sys.exit()
+            if yes_input == "yes" or yes_input == "y":
+                SuperCsv().add_bought(
+                    self.product_name,
+                    self.count,
+                    self.this_date.get_datetime(),
+                    self.price,
+                    self.expiration_date,
+                )
+                print("ok, written to the harddrive.")
+            else:
+                input("No data saved. Press enter to exit")
+                sys.exit()
+        elif buy_or_sell == "sell":
+            id_list = SuperCsv().find_bought_id(self.product_name)
+            if len(id_list) == 0:
+                self.default_error_message(
+                    f"{self.product_name} not found in bought list"
+                )
+            if len(id_list) > 1:
+                print(f"found multiple {self.product_name}")
+                for item in id_list:
+                    print(item)
+                possible_list = [item[0] for item in id_list]
+                correct_id = input("please input the correct id\n")
+                if correct_id in possible_list:
+                    for item in id_list:
+                        if item[0] == correct_id:
+                            id_list = item
+                else:
+                    self.default_error_message("no matching id found, please try again")
+
+            yes_input = input(
+                f"On the date: {self.this_date.get_datetime()}\n you want to sell {self.count} {self.product_name}, for the price of {self.price}\n please enter [y] or [yes] if correct\n"
+            )
+            if yes_input == "yes" or yes_input == "y":
+                SuperCsv().sell_product(
+                    id_list[0][0], self.count, self.this_date.get_datetime(), self.price
+                )
+                print("ok, written to the harddrive.")
+            else:
+                input("No data saved. Press enter to exit")
+                sys.exit()
 
     def default_error_message(self, text="Error, something went wrong"):
         print(text + "\nplease try again")
@@ -141,6 +172,26 @@ class ArgParse:
             if month > 12:
                 self.default_error_message("months can not exceed 12")
 
+    # methods for the choice argument
+    def buy(self):
+        self.product_name = self.checkArgument(
+            self.product_name, "product name with underscore between words"
+        )
+        self.check_product_name()
+        self.count = self.checkArgument(
+            self.count, f"number of how many of {self.product_name} will be bought"
+        )
+        self.check_if_int(self.count)
+        self.price = self.checkArgument(self.price, "price")
+        self.check_if_int(self.price)
+        self.expiration_date = self.checkArgument(
+            self.expiration_date, "expiration date [yyyy] or [yyyy-mm]"
+        )
+
+        self.check_if_int(self.expiration_date)
+        self.check_expiration_date()
+        self.conformation("buy")
+
     def run(self):
         args = self.parser.parse_args()
 
@@ -154,22 +205,17 @@ class ArgParse:
         self.advance_time = args.advance_time
 
         # work with the arguments
-        # choice was [buy]
         if self.choice == "buy":
+            self.buy()
+        elif self.choice == "sell":
             self.product_name = self.checkArgument(
                 self.product_name, "product name with underscore between words"
             )
             self.check_product_name()
             self.count = self.checkArgument(
-                self.count, f"number of how many of {self.product_name} will be bought"
+                self.count, f"number of how many of {self.product_name} will be sold"
             )
             self.check_if_int(self.count)
             self.price = self.checkArgument(self.price, "price")
             self.check_if_int(self.price)
-            self.expiration_date = self.checkArgument(
-                self.expiration_date, "expiration date [yyyy] or [yyyy-mm]"
-            )
-
-            self.check_if_int(self.expiration_date)
-            self.check_expiration_date()
-            self.conformation()
+            self.conformation("sell")
