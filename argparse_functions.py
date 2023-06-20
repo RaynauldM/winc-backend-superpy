@@ -192,6 +192,19 @@ class ArgParse:
         self.check_expiration_date()
         self.conformation("buy")
 
+    def sell(self):
+        self.product_name = self.checkArgument(
+            self.product_name, "product name with underscore between words"
+        )
+        self.check_product_name()
+        self.count = self.checkArgument(
+            self.count, f"number of how many of {self.product_name} will be sold"
+        )
+        self.check_if_int(self.count)
+        self.price = self.checkArgument(self.price, "price")
+        self.check_if_int(self.price)
+        self.conformation("sell")
+
     def run(self):
         args = self.parser.parse_args()
 
@@ -208,14 +221,9 @@ class ArgParse:
         if self.choice == "buy":
             self.buy()
         elif self.choice == "sell":
-            self.product_name = self.checkArgument(
-                self.product_name, "product name with underscore between words"
-            )
-            self.check_product_name()
-            self.count = self.checkArgument(
-                self.count, f"number of how many of {self.product_name} will be sold"
-            )
-            self.check_if_int(self.count)
-            self.price = self.checkArgument(self.price, "price")
-            self.check_if_int(self.price)
-            self.conformation("sell")
+            self.sell()
+        elif self.choice == "report":
+            if self.report_choice == "no_report_choice":
+                self.default_error_message(
+                    "Please provide a second argument after [report].\nThe arguments you can choose are [inventory], [revenue] or [profit]."
+                )
