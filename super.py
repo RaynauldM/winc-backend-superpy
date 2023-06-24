@@ -1,7 +1,6 @@
 # Imports
-from argparse_functions import ArgParse
-from csv_functions import *
-from datetime_functions import *
+from argparse_class import ArgParse
+
 
 # my own imports
 

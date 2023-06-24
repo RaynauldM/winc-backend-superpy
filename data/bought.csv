@@ -1,3 +1,11 @@
-id,product_name,count,buy_date,buy_price,expiration_date
-0,uien,1,2023-6-18,90,2025-01
-3,poep,5,2023-6-20,80,2025-01
+id,product_name,count,buy_date,buy_price,expiration_date
+0,test,20,2023-6-24,90,2030-01
+1,testje,45,2023-6-24,20,2050-01
+2,tes,5,2023-6-24,39,2090-01
+3,test,35,2023-6-24,90,2098-01
+4,test,4,2023-6-24,50,2070-01
+5,voetenzalf,5,2023-6-24,70,2090-01
+6,kaas,90,2023-06,100,2080-09
+7,poepjes,4,2023-06,90,2050-01
+8,ppoepblokken,90,2090-01,90,2080-01
+9,poephoofkaas,800,2090-01,90,2091-01
