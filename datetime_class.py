@@ -16,7 +16,7 @@ class SuperDatetime:
             else:
                 return content
 
-    def set_date(self, new_date):
+    def set_date(self, new_date="this_date"):
         if new_date == "this_date":
             with open("data/date.txt", "w") as file:
                 file.write(self.get_datetime())
@@ -25,6 +25,15 @@ class SuperDatetime:
             new_date_str = new_date_obj.strftime("%Y-%m")
             with open("data/date.txt", "w") as file:
                 file.write(new_date_str)
+
+    def advance_date(self, num):
+        old_date = self.get_date()
+        old_year = self.get_year()
+        new_year = int(old_year) + num
+        month = old_date[-2:]
+        new_date = f"{new_year}-{month}"
+
+        self.set_date(new_date)
 
     def get_datetime(self):
         return self.dt.strftime("%Y-%m")

@@ -6,7 +6,8 @@ from datetime_class import SuperDatetime
 choice_help_message = """
 [buy] buy product,\n
 [sell] sell product,\n
-[report] show inventory\n
+[report] show inventory,\n
+[] work with date\n
 """
 
 # list to check if a string only contains numbers, dots and dash in the check_if_int method
@@ -64,14 +65,13 @@ class ArgParse:
 
         self.parser.add_argument("-yd", "--yesterday", action="store_true")
 
-        self.parser.add_argument(
-            "--date",
-            help="type a date in [yyyy-mm] format to get the information of the chosen month",
-        )
-
         self.parser.add_argument("-set", "--set_date")
 
         self.parser.add_argument("-see", "--see_date", action="store_true")
+
+        self.parser.add_argument("-rd", "--reset_date", action="store_true")
+
+        self.parser.add_argument("-at", "--advance_time", default=0, type=int)
 
         self.choice = "default"
         self.report_choice = "default"
@@ -84,6 +84,8 @@ class ArgParse:
         self.id_list = []
         self.see_date = False
         self.get_date = SuperDatetime().get_date()
+        self.reset_date = False
+        self.advance_time = 0
 
     def checkArgument(self, var, string):
         if var is None or var == "":
@@ -246,6 +248,8 @@ class ArgParse:
         self.expiration_date = args.expiration_date
         self.set_date = args.set_date
         self.see_date = args.see_date
+        self.reset_date = args.reset_date
+        self.advance_time = args.advance_time
 
         # work with the arguments
         if self.choice == "buy":
@@ -257,14 +261,24 @@ class ArgParse:
                 self.print_working_date()
                 input("")
                 sys.exit()
-            if self.check_if_int(self.set_date):
-                try:
+            if self.reset_date is True:
+                SuperDatetime().set_date()
+                input(f"Changed date to {SuperDatetime().get_datetime()}")
+                sys.exit()
+
+            if self.advance_time > 0:
+                SuperDatetime().advance_date(self.advance_time)
+                print("Changed the date")
+                sys.exit()
+
+            if self.set_date != "default":
+                if self.check_if_int(self.set_date):
                     SuperDatetime().set_date(self.set_date)
-                    self.print_working_date()
-                except:
-                    self.default_error_message(
-                        "something went wrong setting the date, please try again"
-                    )
+                    print("updated the date!")
+                    sys.exit()
+                else:
+                    self.default_error_message("invalid input for setting the date")
+
         elif self.choice == "report":
             if self.report_choice == "no_report_choice":
                 self.default_error_message(
