@@ -2,6 +2,7 @@ import argparse
 import sys
 from csv_class import SuperCsv
 from datetime_class import SuperDatetime
+from datetime import datetime, timedelta
 
 choice_help_message = """
 [buy] buy product,\n
@@ -58,8 +59,6 @@ class ArgParse:
             "--expiration-date",
             help="set the expiration date for the product to buy, in the format [yyyy] to set only year or [yyyy-mm] to set year and month",
         )
-
-        self.parser.add_argument("--now", action="store_true")
 
         self.parser.add_argument("--today", action="store_true")
 
@@ -204,6 +203,29 @@ class ArgParse:
         print(f"the working date is: {self.get_date}")
 
     # methods for the choice argument
+    def no_choice(self):
+        if self.see_date is True:
+            self.print_working_date()
+            input("")
+            sys.exit()
+        if self.reset_date is True:
+            SuperDatetime().set_date()
+            input(f"Changed date to {SuperDatetime().get_datetime()}")
+            sys.exit()
+
+        if self.advance_time > 0:
+            SuperDatetime().advance_date(self.advance_time)
+            print("Changed the date")
+            sys.exit()
+
+        if self.set_date != "default":
+            if self.check_if_int(self.set_date):
+                SuperDatetime().set_date(self.set_date)
+                print("updated the date!")
+                sys.exit()
+            else:
+                self.default_error_message("invalid input for setting the date")
+
     def buy(self):
         self.product_name = self.checkArgument(
             self.product_name, "product name with underscore between words"
@@ -250,6 +272,8 @@ class ArgParse:
         self.see_date = args.see_date
         self.reset_date = args.reset_date
         self.advance_time = args.advance_time
+        self.today = args.today
+        self.yesterday = args.yesterday
 
         # work with the arguments
         if self.choice == "buy":
@@ -257,33 +281,34 @@ class ArgParse:
         elif self.choice == "sell":
             self.sell()
         elif self.choice == "default_argument":
-            if self.see_date is True:
-                self.print_working_date()
-                input("")
-                sys.exit()
-            if self.reset_date is True:
-                SuperDatetime().set_date()
-                input(f"Changed date to {SuperDatetime().get_datetime()}")
-                sys.exit()
-
-            if self.advance_time > 0:
-                SuperDatetime().advance_date(self.advance_time)
-                print("Changed the date")
-                sys.exit()
-
-            if self.set_date != "default":
-                if self.check_if_int(self.set_date):
-                    SuperDatetime().set_date(self.set_date)
-                    print("updated the date!")
-                    sys.exit()
-                else:
-                    self.default_error_message("invalid input for setting the date")
-
+            self.no_choice()
         elif self.choice == "report":
             if self.report_choice == "no_report_choice":
                 self.default_error_message(
                     "Please provide a second argument after [report].\nThe arguments you can choose are [inventory], [revenue] or [profit]."
                 )
             elif self.report_choice == "inventory":
-                inventory = SuperCsv().get_inventory()
-                self.super_print(inventory)
+                if self.today:
+                    inventory = SuperCsv().get_inventory()
+                    self.super_print(inventory)
+                if self.yesterday:
+                    inventory = SuperCsv().get_inventory_yesterday()
+                    self.super_print(inventory)
+            elif self.report_choice == "revenue":
+                if self.today:
+                    today = SuperDatetime().working_date
+                    revenue = SuperCsv().get_revenue(today, today)
+                    print(f"Todays revenue: {revenue}")
+                if self.yesterday:
+                    yesterday = SuperDatetime().get_yesterday()
+                    revenue = SuperCsv().get_revenue(yesterday, yesterday)
+                    print(f"Yesterdays revenue: {revenue}")
+            elif self.report_choice == "profit":
+                if self.today:
+                    today = SuperDatetime().working_date
+                    profit = SuperCsv().get_profit(today, today)
+                    print(f"Todays profit is: {profit}")
+                if self.yesterday:
+                    yesterday = SuperDatetime().get_yesterday()
+                    profit = SuperCsv().get_profit(yesterday, yesterday)
+                    print(f"Yesterdays profit is: {profit}")

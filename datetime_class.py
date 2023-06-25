@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 class SuperDatetime:
@@ -16,27 +16,29 @@ class SuperDatetime:
             else:
                 return content
 
+    def get_yesterday(self):
+        today = datetime.strptime(self.get_date(), "%Y-%m-%d")
+        yesterday = today - timedelta(days=1)
+        return yesterday.strftime("%Y-%m-%d")
+
     def set_date(self, new_date="this_date"):
         if new_date == "this_date":
             with open("data/date.txt", "w") as file:
                 file.write(self.get_datetime())
         else:
-            new_date_obj = datetime.strptime(new_date, "%Y-%m")
-            new_date_str = new_date_obj.strftime("%Y-%m")
+            new_date_obj = datetime.strptime(new_date, "%Y-%m-%d")
+            new_date_str = new_date_obj.strftime("%Y-%m-%d")
             with open("data/date.txt", "w") as file:
                 file.write(new_date_str)
 
     def advance_date(self, num):
         old_date = self.get_date()
-        old_year = self.get_year()
-        new_year = int(old_year) + num
-        month = old_date[-2:]
-        new_date = f"{new_year}-{month}"
+        new_date = datetime.strptime(old_date, "%Y-%m-%d") + timedelta(days=num)
 
-        self.set_date(new_date)
+        self.set_date(new_date.strftime("%Y-%m-%d"))
 
     def get_datetime(self):
-        return self.dt.strftime("%Y-%m")
+        return self.dt.strftime("%Y-%m-%d")
 
     def get_year(self):
         return_year = ""
