@@ -1,6 +1,7 @@
 from argparse_class import ArgParse
 from csv_class import SuperCsv
 
+# some variables to be used in the tests
 
 product_name = "test"
 id_list = SuperCsv().find_bought_id(product_name)

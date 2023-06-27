@@ -1,8 +1,8 @@
-from csv_class import SuperCsv
-from datetime_class import SuperDatetime
-
 import argparse
 import sys
+
+from csv_class import SuperCsv
+from datetime_class import SuperDatetime
 
 choice_help_message = """
 [buy] buy product,
@@ -11,7 +11,8 @@ choice_help_message = """
 [] work with date
 """
 
-# list to check if a string only contains numbers, dots and dash in the check_if_int method
+# list to check if a string only contains numbers
+# dots and dash in the check_if_int method
 symbols = [
     chr(i)
     for i in range(32, 127)
@@ -22,11 +23,20 @@ symbols = [
 class ArgParse:
     def __init__(self):
         self.parser = argparse.ArgumentParser(
-            description="A program to help a supermarket keep track of products bought and sold"
+            prog="super.py",
+            description="a program to help a supermarket keep "
+            "track of products bought and sold",
+            epilog="for any questions contact me at raynauldminkema@gmail.com",
+        )
+
+        self.positionals = self.parser.add_argument_group("POSITIONAL ARGUMENTS")
+        self.optionals = self.parser.add_argument_group("OPTIONAL ARGUMENTS")
+        self.times = self.parser.add_argument_group(
+            "arguments relating to WORKING DATE. Use without positional arguments"
         )
 
         # first positional argument, to be ommited to change the datetime
-        self.parser.add_argument(
+        self.positionals.add_argument(
             "choice",
             nargs="?",
             default="default_argument",
@@ -34,7 +44,7 @@ class ArgParse:
         )
 
         # second positional argument, in case of first argument == 'report'
-        self.parser.add_argument(
+        self.positionals.add_argument(
             "report_choice",
             nargs="?",
             default="no_report_choice",
@@ -43,88 +53,94 @@ class ArgParse:
 
         # optional arguments
 
-        self.parser.add_argument(
+        self.times.add_argument(
             "-at",
             "--advance_time",
             default=0,
             type=int,
-            help="Advance current date by chosen number of days",
+            help="advance current date by chosen number of days",
         )
 
-        self.parser.add_argument(
-            "-c", "--count", help="Set the amount of the product to buy"
+        self.optionals.add_argument(
+            "-c",
+            "--count",
+            help="use with [buy] or [sell] to set the amount of the product to buy",
         )
 
-        self.parser.add_argument(
+        self.optionals.add_argument(
             "-cp",
             "--choose_parameter",
             action="store_true",
-            help="Choose a specific period between two dates",
+            help="used with [report] [revenue] and [report] [profit], together with [-stard] and [-end] to choose a specific period between two dates",
         )
 
-        self.parser.add_argument(
+        self.optionals.add_argument(
             "-ed",
             "--expiration_date",
-            help="set the expiration date for the product to buy, in the format [yyyy] to set only year or [yyyy-mm] to set year and month",
+            help="use with [buy] to set the expiration date, in the format [yyyy] to set only year or [yyyy-mm] to set year and month",
         )
 
-        self.parser.add_argument(
+        self.optionals.add_argument(
             "-end",
             "--end_date",
             default="default",
-            help="End date for choose_parameter argument",
+            help="end date for choose_parameter argument",
         )
 
-        self.parser.add_argument(
-            "-p", "--price", help="set the price for the product to buy"
+        self.optionals.add_argument(
+            "-p",
+            "--price",
+            help="use with [buy] or [sell] to set the price for the product",
         )
 
-        self.parser.add_argument(
+        self.optionals.add_argument(
             "-pn",
             "--product-name",
-            help="name of the product to be bought in single form",
+            help="use with [buy] or [sell] to name the product",
         )
 
-        self.parser.add_argument(
+        self.times.add_argument(
             "-rd",
             "--reset_date",
             action="store_true",
-            help="Reset current working date to date of machine",
+            help="reset current working date to current date of machine",
         )
 
-        self.parser.add_argument(
+        self.times.add_argument(
             "-see",
             "--see_date",
             action="store_true",
-            help="See the current working date",
+            help="see the current working date",
         )
 
-        self.parser.add_argument(
+        self.times.add_argument(
             "-set",
             "--set_date",
             default="default",
-            help="Set the date in format [yyy-mm-dd]",
+            help="set the date in format [yyy-mm-dd]",
         )
 
-        self.parser.add_argument(
+        self.optionals.add_argument(
             "-stard",
             "--start_date",
             default="default",
-            help="Starting date for choose_parameter argument",
+            help="starting date for choose_parameter argument",
         )
 
-        self.parser.add_argument(
-            "--today", action="store_true", help="Use the current working date"
+        self.optionals.add_argument(
+            "--today",
+            action="store_true",
+            help="use with [report] to use the current working date",
         )
 
-        self.parser.add_argument(
+        self.optionals.add_argument(
             "-yd",
             "--yesterday",
             action="store_true",
-            help="Use the day before the current working date",
+            help="use with [report] to use the day before the current working date",
         )
 
-    # custom check to see if arguments are valid, a bit redundant, but I'll keep it in place still
+    # custom check to see if arguments are valid, a bit redundant probably
     def checkArgument(self, var, string):
         if var is None or var == "":
             var = input(f"Please enter a {string}:\n")

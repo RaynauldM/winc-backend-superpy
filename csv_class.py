@@ -1,11 +1,11 @@
-from datetime_class import SuperDatetime
-from datetime import datetime, timedelta
-from pathlib import Path
-
 import csv
 import shutil
 import sys
 import tempfile
+
+from datetime_class import SuperDatetime
+from datetime import datetime, timedelta
+from pathlib import Path
 
 
 class SuperCsv:
@@ -22,7 +22,6 @@ class SuperCsv:
         with open(self.data_bought, "a", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([row_count - 1, name, count, date, price, exp])
-        return True
 
     def get_count(self, id):
         with open(self.data_bought, "r") as file:
