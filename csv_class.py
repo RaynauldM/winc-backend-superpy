@@ -1,10 +1,11 @@
-import csv
 from datetime_class import SuperDatetime
 from datetime import datetime, timedelta
 from pathlib import Path
-import tempfile
+
+import csv
 import shutil
 import sys
+import tempfile
 
 
 class SuperCsv:
@@ -21,6 +22,7 @@ class SuperCsv:
         with open(self.data_bought, "a", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([row_count - 1, name, count, date, price, exp])
+        return True
 
     def get_count(self, id):
         with open(self.data_bought, "r") as file:
@@ -50,7 +52,7 @@ class SuperCsv:
 
     def get_inventory_yesterday(self):
         yesterday = SuperDatetime().dt - timedelta(days=1)
-        formatted_date = yesterday.strftime("%Y-%m-%d")
+        formatted_date = yesterday.strftime("%Y-%m")
         inventory = SuperCsv().get_inventory()
         filtered_inventory = [
             item for item in inventory if item[3].startswith(formatted_date)
@@ -69,6 +71,8 @@ class SuperCsv:
         with open(self.data_bought, "r") as f:
             reader = csv.reader(f)
             for row in reader:
+                if len(row) == 0:
+                    continue
                 try:
                     date = datetime.strptime(row[3], "%Y-%m-%d")
                     if start_datetime <= date <= end_datetime:
@@ -89,6 +93,8 @@ class SuperCsv:
         with open(self.data_sold, "r") as f:
             reader = csv.reader(f)
             for row in reader:
+                if len(row) == 0:
+                    continue
                 try:
                     date = datetime.strptime(row[3], "%Y-%m-%d")
                     if start_datetime <= date <= end_datetime:

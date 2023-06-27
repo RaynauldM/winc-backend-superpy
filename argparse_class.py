@@ -1,13 +1,14 @@
-import argparse
-import sys
 from csv_class import SuperCsv
 from datetime_class import SuperDatetime
 
+import argparse
+import sys
+
 choice_help_message = """
-[buy] buy product,\n
-[sell] sell product,\n
-[report] report on report_choice,\n
-[] work with date\n
+[buy] buy product,
+[sell] sell product,
+[report] report on report_choice,
+[] work with date
 """
 
 # list to check if a string only contains numbers, dots and dash in the check_if_int method
@@ -41,6 +42,43 @@ class ArgParse:
         )
 
         # optional arguments
+
+        self.parser.add_argument(
+            "-at",
+            "--advance_time",
+            default=0,
+            type=int,
+            help="Advance current date by chosen number of days",
+        )
+
+        self.parser.add_argument(
+            "-c", "--count", help="Set the amount of the product to buy"
+        )
+
+        self.parser.add_argument(
+            "-cp",
+            "--choose_parameter",
+            action="store_true",
+            help="Choose a specific period between two dates",
+        )
+
+        self.parser.add_argument(
+            "-ed",
+            "--expiration_date",
+            help="set the expiration date for the product to buy, in the format [yyyy] to set only year or [yyyy-mm] to set year and month",
+        )
+
+        self.parser.add_argument(
+            "-end",
+            "--end_date",
+            default="default",
+            help="End date for choose_parameter argument",
+        )
+
+        self.parser.add_argument(
+            "-p", "--price", help="set the price for the product to buy"
+        )
+
         self.parser.add_argument(
             "-pn",
             "--product-name",
@@ -48,16 +86,31 @@ class ArgParse:
         )
 
         self.parser.add_argument(
-            "-c", "--count", help="Set the amount of the product to buy"
-        )
-        self.parser.add_argument(
-            "-p", "--price", help="set the price for the product to buy"
+            "-rd",
+            "--reset_date",
+            action="store_true",
+            help="Reset current working date to date of machine",
         )
 
         self.parser.add_argument(
-            "-ed",
-            "--expiration-date",
-            help="set the expiration date for the product to buy, in the format [yyyy] to set only year or [yyyy-mm] to set year and month",
+            "-see",
+            "--see_date",
+            action="store_true",
+            help="See the current working date",
+        )
+
+        self.parser.add_argument(
+            "-set",
+            "--set_date",
+            default="default",
+            help="Set the date in format [yyy-mm-dd]",
+        )
+
+        self.parser.add_argument(
+            "-stard",
+            "--start_date",
+            default="default",
+            help="Starting date for choose_parameter argument",
         )
 
         self.parser.add_argument(
@@ -69,56 +122,6 @@ class ArgParse:
             "--yesterday",
             action="store_true",
             help="Use the day before the current working date",
-        )
-
-        self.parser.add_argument(
-            "-set",
-            "--set_date",
-            default="default",
-            help="Set the date in format [yyy-mm-dd]",
-        )
-
-        self.parser.add_argument(
-            "-see",
-            "--see_date",
-            action="store_true",
-            help="See the current working date",
-        )
-
-        self.parser.add_argument(
-            "-rd",
-            "--reset_date",
-            action="store_true",
-            help="Reset current working date to date of machine",
-        )
-
-        self.parser.add_argument(
-            "-at",
-            "--advance_time",
-            default=0,
-            type=int,
-            help="Advance current date by chosen number of days",
-        )
-
-        self.parser.add_argument(
-            "-cp",
-            "--choose_parameter",
-            action="store_true",
-            help="Choose a specific period between two dates",
-        )
-
-        self.parser.add_argument(
-            "-stard",
-            "--start_date",
-            default="default",
-            help="Starting date for choose_parameter argument",
-        )
-
-        self.parser.add_argument(
-            "-end",
-            "--end_date",
-            default="default",
-            help="End date for choose_parameter argument",
         )
 
     # custom check to see if arguments are valid, a bit redundant, but I'll keep it in place still
@@ -141,6 +144,7 @@ class ArgParse:
                 self.default_error_message(
                     "This will bring us out of stock! Please try again"
                 )
+        return True
 
     def check_expiration_date(self):
         ex_list = list(self.expiration_date)
@@ -159,6 +163,7 @@ class ArgParse:
             month = int(month)
             if month > 12:
                 self.default_error_message("months can not exceed 12")
+        return True
 
     def check_if_int(self, obj):
         li = list(obj)
@@ -190,12 +195,17 @@ class ArgParse:
                             self.id_list = item
                 else:
                     self.default_error_message("no matching id found, please try again")
+        return True
+
+    def getInput(self, text):
+        return input(text)
 
     def conformation(self, buy_or_sell):
         if buy_or_sell == "buy":
-            yes_input = input(
+            yes_input = self.getInput(
                 f"On the date: {SuperDatetime().get_date()}\n you want to buy {self.count} {self.product_name}, for the price of {self.price}, which whill expire on {self.expiration_date}\n please enter [y] or [yes] if correct\n"
             )
+
             if yes_input == "yes" or yes_input == "y":
                 SuperCsv().add_bought(
                     self.product_name,
@@ -208,6 +218,7 @@ class ArgParse:
             else:
                 input("No data saved. Press enter to exit")
                 sys.exit()
+
         elif buy_or_sell == "sell":
             yes_input = input(
                 f"On the date: {SuperDatetime().get_date()}\n you want to sell {self.count} {self.product_name}, for the price of {self.price}\n please enter [y] or [yes] if correct\n"
@@ -257,6 +268,8 @@ class ArgParse:
 
         self.check_if_int(self.expiration_date)
         self.check_expiration_date()
+        if self.choice == "test":
+            return True
         self.conformation("buy")
 
     def no_choice(self):
@@ -364,27 +377,29 @@ class ArgParse:
         self.check_count()
         self.price = self.checkArgument(self.price, "price")
         self.check_if_int(self.price)
+        if self.choice == "test":
+            return True
         self.conformation("sell")
 
     def run(self):
         args = self.parser.parse_args()
 
         # collect the arguments
-        self.choice = args.choice
-        self.report_choice = args.report_choice
-        self.product_name = args.product_name
-        self.count = args.count
-        self.price = args.price
-        self.expiration_date = args.expiration_date
-        self.set_date = args.set_date
-        self.see_date = args.see_date
-        self.reset_date = args.reset_date
         self.advance_time = args.advance_time
+        self.choice = args.choice
+        self.choose_param = args.choose_parameter
+        self.count = args.count
+        self.end_date = args.end_date
+        self.expiration_date = args.expiration_date
+        self.price = args.price
+        self.product_name = args.product_name
+        self.report_choice = args.report_choice
+        self.reset_date = args.reset_date
+        self.see_date = args.see_date
+        self.set_date = args.set_date
+        self.start_date = args.start_date
         self.today = args.today
         self.yesterday = args.yesterday
-        self.choose_param = args.choose_parameter
-        self.start_date = args.start_date
-        self.end_date = args.end_date
 
         # work with the choice argument
         if self.choice == "buy":
