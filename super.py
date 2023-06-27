@@ -1,10 +1,5 @@
-# Imports
 from argparse_class import ArgParse
 
-
-# my own imports
-
-from rich import print
 
 # Do not change these lines.
 __winc_id__ = "a2bc36ea784242e4989deb157d527ba0"

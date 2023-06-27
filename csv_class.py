@@ -14,6 +14,90 @@ class SuperCsv:
         self.data_bought = Path(self.data_directory, "bought.csv")
         self.data_sold = Path(self.data_directory, "sold.csv")
 
+    def add_bought(self, name, count, date, price, exp):
+        with open(self.data_bought, "r") as file:
+            reader = csv.reader(file)
+            row_count = len(list(reader))
+        with open(self.data_bought, "a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([row_count - 1, name, count, date, price, exp])
+
+    def get_count(self, id):
+        with open(self.data_bought, "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if row[0] == str(id):
+                    return row[2]
+
+    def get_inventory(self):
+        return_list = []
+        with open(self.data_bought, "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if len(row) == 0:
+                    continue
+                if row[0] == "id":
+                    continue
+                else:
+                    return_list.append(row)
+
+        return return_list
+
+    def get_inventory_any_day(self, date):
+        inventory = SuperCsv().get_inventory()
+        filtered_inventory = [item for item in inventory if item[3].startswith(date)]
+        return filtered_inventory
+
+    def get_inventory_yesterday(self):
+        yesterday = SuperDatetime().dt - timedelta(days=1)
+        formatted_date = yesterday.strftime("%Y-%m-%d")
+        inventory = SuperCsv().get_inventory()
+        filtered_inventory = [
+            item for item in inventory if item[3].startswith(formatted_date)
+        ]
+        return filtered_inventory
+
+    def get_profit(self, start_date, end_date):
+        cost = 0.0
+        revenue = self.get_revenue(start_date, end_date)
+        start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+        end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+        if self.is_file_empty(self.data_bought) is True:
+            print("nothing bought yet")
+            input("")
+            sys.exit()
+        with open(self.data_bought, "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                try:
+                    date = datetime.strptime(row[3], "%Y-%m-%d")
+                    if start_datetime <= date <= end_datetime:
+                        cost += float(row[4])
+                except ValueError:
+                    continue
+
+        return revenue - cost
+
+    def get_revenue(self, start_date, end_date):
+        revenue = 0.0
+        start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
+        end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
+        if self.is_file_empty(self.data_sold) is True:
+            print("nothing sold yet")
+            input("")
+            sys.exit()
+        with open(self.data_sold, "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                try:
+                    date = datetime.strptime(row[3], "%Y-%m-%d")
+                    if start_datetime <= date <= end_datetime:
+                        revenue += float(row[4])
+                except ValueError:
+                    continue
+
+        return revenue
+
     def is_file_empty(self, file):
         checked_list = []
         with open(file) as f:
@@ -25,41 +109,6 @@ class SuperCsv:
         if len(checked_list) < 2:
             return True
         return False
-
-    def get_inventory_yesterday(self):
-        yesterday = SuperDatetime().dt - timedelta(days=1)
-        formatted_date = yesterday.strftime("%Y-%m")
-        inventory = SuperCsv().get_inventory()
-        filtered_inventory = [
-            item for item in inventory if item[3].startswith(formatted_date)
-        ]
-        return filtered_inventory
-
-    def get_inventory(self):
-        return_list = []
-        with open(self.data_bought, "r") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                if row[0] == "id":
-                    continue
-                else:
-                    return_list.append(row)
-        return return_list
-
-    def get_count(self, id):
-        with open(self.data_bought, "r") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                if row[0] == str(id):
-                    return row[2]
-
-    def add_bought(self, name, count, date, price, exp):
-        with open(self.data_bought, "r") as file:
-            reader = csv.reader(file)
-            row_count = len(list(reader))
-        with open(self.data_bought, "a", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow([row_count - 1, name, count, date, price, exp])
 
     def sell_product(self, bought_id, count, date, price):
         with open(self.data_sold, "r") as file:
@@ -108,44 +157,3 @@ class SuperCsv:
             writer.writerows(rows_to_write)
 
         shutil.move(temp.name, self.data_bought)
-
-    def get_revenue(self, start_date, end_date):
-        revenue = 0.0
-        start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
-        end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
-        if self.is_file_empty(self.data_sold) is True:
-            print("nothing sold yet")
-            input("")
-            sys.exit()
-        with open(self.data_sold, "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                try:
-                    date = datetime.strptime(row[3], "%Y-%m-%d")
-                    if start_datetime <= date <= end_datetime:
-                        revenue += float(row[4])
-                except ValueError:
-                    continue
-
-        return revenue
-
-    def get_profit(self, start_date, end_date):
-        cost = 0.0
-        revenue = self.get_revenue(start_date, end_date)
-        start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
-        end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
-        if self.is_file_empty(self.data_bought) is True:
-            print("nothing bought yet")
-            input("")
-            sys.exit()
-        with open(self.data_bought, "r") as f:
-            reader = csv.reader(f)
-            for row in reader:
-                try:
-                    date = datetime.strptime(row[3], "%Y-%m-%d")
-                    if start_datetime <= date <= end_datetime:
-                        cost += float(row[4])
-                except ValueError:
-                    continue
-
-        return revenue - cost

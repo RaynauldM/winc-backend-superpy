@@ -7,6 +7,12 @@ class SuperDatetime:
         self.dt = datetime.date(datetime.now())
         self.working_date = self.get_date()
 
+    def advance_date(self, num):
+        old_date = self.get_date()
+        new_date = datetime.strptime(old_date, "%Y-%m-%d") + timedelta(days=num)
+
+        self.set_date(new_date.strftime("%Y-%m-%d"))
+
     def get_date(self):
         with open("data/date.txt", "r") as file:
             content = file.read()
@@ -15,6 +21,18 @@ class SuperDatetime:
                 return content
             else:
                 return content
+
+    def get_datetime(self):
+        return self.dt.strftime("%Y-%m-%d")
+
+    def get_year(self):
+        return_year = ""
+        li = list(self.working_date)
+        return_year += li[0]
+        return_year += li[1]
+        return_year += li[2]
+        return_year += li[3]
+        return return_year
 
     def get_yesterday(self):
         today = datetime.strptime(self.get_date(), "%Y-%m-%d")
@@ -30,21 +48,3 @@ class SuperDatetime:
             new_date_str = new_date_obj.strftime("%Y-%m-%d")
             with open("data/date.txt", "w") as file:
                 file.write(new_date_str)
-
-    def advance_date(self, num):
-        old_date = self.get_date()
-        new_date = datetime.strptime(old_date, "%Y-%m-%d") + timedelta(days=num)
-
-        self.set_date(new_date.strftime("%Y-%m-%d"))
-
-    def get_datetime(self):
-        return self.dt.strftime("%Y-%m-%d")
-
-    def get_year(self):
-        return_year = ""
-        li = list(self.working_date)
-        return_year += li[0]
-        return_year += li[1]
-        return_year += li[2]
-        return_year += li[3]
-        return return_year
