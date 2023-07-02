@@ -3,6 +3,7 @@ import sys
 
 from csv_class import SuperCsv
 from datetime_class import SuperDatetime
+from rich import print
 
 choice_help_message = """
 [buy] buy product,
@@ -55,7 +56,7 @@ class ArgParse:
 
         self.times.add_argument(
             "-at",
-            "--advance_time",
+            "--advance-time",
             default=0,
             type=int,
             help="advance current date by chosen number of days",
@@ -76,7 +77,7 @@ class ArgParse:
 
         self.optionals.add_argument(
             "-ed",
-            "--expiration_date",
+            "--expiration-date",
             help="use with [buy] to set the expiration date, in the format [yyyy] to set only year or [yyyy-mm] to set year and month",
         )
 
@@ -200,7 +201,9 @@ class ArgParse:
                     f"{self.product_name} not found in bought list"
                 )
             if len(self.id_list) > 1:
-                print(f"found multiple {self.product_name}")
+                print(
+                    f"found multiple [bold underline]{self.product_name}[/bold underline]"
+                )
                 for item in self.id_list:
                     print(item)
                 possible_list = [item[0] for item in self.id_list]
@@ -230,9 +233,10 @@ class ArgParse:
                     self.price,
                     self.expiration_date,
                 )
-                print("ok, written to the harddrive.")
+                print("[green]ok, written to the harddrive[/green]")
             else:
-                input("No data saved. Press enter to exit")
+                print("[red]No data saved.[/red] \nPress enter to exit")
+                input("")
                 sys.exit()
 
         elif buy_or_sell == "sell":
@@ -246,23 +250,27 @@ class ArgParse:
                     SuperDatetime().get_date(),
                     self.price,
                 )
-                print("ok, written to the harddrive.")
+                print("[green]ok, written to the harddrive.[/green]")
             else:
-                input("No data saved. Press enter to exit")
+                print("[red]No data saved.[/red] \nPress enter to exit")
+                input("")
                 sys.exit()
 
-    def default_error_message(self, text="Error, something went wrong"):
+    def default_error_message(self, text="[red]Error[/red], something went wrong"):
         print(text + "\nplease try again")
         input("")
         sys.exit()
 
     def print_working_date(self):
-        print(f"the working date is: {SuperDatetime().get_date()}")
+        print(
+            f"the working date is: [underline]{SuperDatetime().get_date()}[/underline]"
+        )
 
+    # designated print of inventory
     def super_print(self, list):
         for item in list:
             print(
-                f"\nid: {item[0]}\nproduct: {item[1]}\ncount: {item[2]}\nbuy date: {item[3]}\nbuy price: {item[4]}\nexpiration: {item[5]}\n \n"
+                f"\nid: {item[0]}\nproduct: [bold underline]{item[1]}[/bold underline]\ncount: {item[2]}\nbuy date: {item[3]}\nbuy price: {item[4]}\nexpiration: {item[5]}\n \n"
             )
 
     # methods for the choice argument
@@ -295,18 +303,19 @@ class ArgParse:
             sys.exit()
         if self.reset_date is True:
             SuperDatetime().set_date()
-            input(f"Changed date to {SuperDatetime().get_datetime()}")
+            print(f"[blue]Changed date to [/blue]{SuperDatetime().get_datetime()}")
+            input("")
             sys.exit()
 
         if self.advance_time > 0:
             SuperDatetime().advance_date(self.advance_time)
-            print("Changed the date")
+            print("[blue]Advanced the date![/blue]")
             sys.exit()
 
         if self.set_date != "default":
             if self.check_if_int(self.set_date):
                 SuperDatetime().set_date(self.set_date)
-                print("updated the date!")
+                print("[blue]updated the date![/blue]")
                 sys.exit()
             else:
                 self.default_error_message("invalid input for setting the date")
@@ -339,16 +348,16 @@ class ArgParse:
             if self.today:
                 today = SuperDatetime().working_date
                 revenue = SuperCsv().get_revenue(today, today)
-                print(f"Todays revenue: {revenue}")
+                print(f"Todays revenue: [bold green]{revenue}[/bold green]")
             if self.yesterday:
                 yesterday = SuperDatetime().get_yesterday()
                 revenue = SuperCsv().get_revenue(yesterday, yesterday)
-                print(f"Yesterdays revenue: {revenue}")
+                print(f"Yesterdays revenue: [bold green]{revenue}[/bold green]")
             if self.set_date != "default":
                 try:
                     setted_date = self.set_date
                     print(
-                        f"Profit for date {setted_date}: {SuperCsv().get_profit(setted_date,setted_date)}"
+                        f"Profit for date {setted_date}: [bold green]{SuperCsv().get_profit(setted_date,setted_date)}[/bold green]"
                     )
                 except ValueError:
                     self.default_error_message(
@@ -356,22 +365,22 @@ class ArgParse:
                     )
             if self.choose_param:
                 print(
-                    f"For the period {self.start_date} through {self.end_date}\nrevenue: {SuperCsv().get_revenue(self.start_date, self.end_date)}\n"
+                    f"For the period {self.start_date} through {self.end_date}\nrevenue: [bold green]{SuperCsv().get_revenue(self.start_date, self.end_date)}[/bold green]\n"
                 )
         elif self.report_choice == "profit":
             if self.today:
                 today = SuperDatetime().working_date
                 profit = SuperCsv().get_profit(today, today)
-                print(f"Todays profit is: {profit}")
+                print(f"Todays profit is: [bold green][{profit}[/bold green]")
             if self.yesterday:
                 yesterday = SuperDatetime().get_yesterday()
                 profit = SuperCsv().get_profit(yesterday, yesterday)
-                print(f"Yesterdays profit is: {profit}")
+                print(f"Yesterdays profit is: [bold green]{profit}[/bold green]")
             if self.set_date != "default":
                 try:
                     setted_date = self.set_date
                     print(
-                        f"Profit for date {setted_date}: {SuperCsv().get_profit(setted_date,setted_date)}"
+                        f"Profit for date {setted_date}: [bold green]{SuperCsv().get_profit(setted_date,setted_date)}[/bold green]"
                     )
                 except ValueError:
                     self.default_error_message(
@@ -379,7 +388,7 @@ class ArgParse:
                     )
             if self.choose_param:
                 print(
-                    f"For the period {self.start_date} through {self.end_date}\nprofit: {SuperCsv().get_profit(self.start_date, self.end_date)}"
+                    f"For the period {self.start_date} through {self.end_date}\nprofit: [bold green]{SuperCsv().get_profit(self.start_date, self.end_date)}[/bold green]"
                 )
 
     def sell(self):

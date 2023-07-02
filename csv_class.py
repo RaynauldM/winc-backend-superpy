@@ -6,6 +6,7 @@ import tempfile
 from datetime_class import SuperDatetime
 from datetime import datetime, timedelta
 from pathlib import Path
+from rich import print
 
 
 class SuperCsv:
@@ -51,7 +52,7 @@ class SuperCsv:
 
     def get_inventory_yesterday(self):
         yesterday = SuperDatetime().dt - timedelta(days=1)
-        formatted_date = yesterday.strftime("%Y-%m")
+        formatted_date = yesterday.strftime("%Y-%m-%d")
         inventory = SuperCsv().get_inventory()
         filtered_inventory = [
             item for item in inventory if item[3].startswith(formatted_date)
@@ -64,7 +65,7 @@ class SuperCsv:
         start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
         end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
         if self.is_file_empty(self.data_bought) is True:
-            print("nothing bought yet")
+            print("[red]nothing bought yet[/red]")
             input("")
             sys.exit()
         with open(self.data_bought, "r") as f:
@@ -86,7 +87,7 @@ class SuperCsv:
         start_datetime = datetime.strptime(start_date, "%Y-%m-%d")
         end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
         if self.is_file_empty(self.data_sold) is True:
-            print("nothing sold yet")
+            print("[red]nothing sold yet[/red]")
             input("")
             sys.exit()
         with open(self.data_sold, "r") as f:
