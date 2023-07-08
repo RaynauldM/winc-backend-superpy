@@ -6,7 +6,6 @@ import tempfile
 from datetime_class import SuperDatetime
 from datetime import datetime, timedelta
 from pathlib import Path
-from rich import print
 
 
 class SuperCsv:
@@ -15,6 +14,7 @@ class SuperCsv:
         self.data_directory = Path(self.this_directory, "data")
         self.data_bought = Path(self.data_directory, "bought.csv")
         self.data_sold = Path(self.data_directory, "sold.csv")
+        self.sold_list = self.get_sold_list()
 
     def add_bought(self, name, count, date, price, exp):
         with open(self.data_bought, "r") as file:
@@ -58,6 +58,11 @@ class SuperCsv:
             item for item in inventory if item[3].startswith(formatted_date)
         ]
         return filtered_inventory
+
+    def get_ordered_list(self):
+        old_list = self.get_sold_list()
+        new_list = sorted(old_list, key=lambda x: x[3])
+        return new_list
 
     def get_profit(self, start_date, end_date):
         cost = 0.0
@@ -103,6 +108,20 @@ class SuperCsv:
                     continue
 
         return revenue
+
+    def get_start_date(self):
+        pass
+
+    def get_sold_list(self):
+        return_list = []
+        with open(self.data_sold, "r") as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row[0] == "id":
+                    continue
+                else:
+                    return_list.append(row)
+        return return_list
 
     def is_file_empty(self, file):
         checked_list = []

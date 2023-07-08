@@ -3,7 +3,9 @@ import sys
 
 from csv_class import SuperCsv
 from datetime_class import SuperDatetime
+
 from rich import print
+from show_graph_class import SuperPlot
 
 choice_help_message = """
 [buy] buy product,
@@ -112,6 +114,13 @@ class ArgParse:
             "--see_date",
             action="store_true",
             help="see the current working date",
+        )
+
+        self.optionals.add_argument(
+            "-sg",
+            "--show_graph",
+            action="store_true",
+            help="Show revenue in a visual form",
         )
 
         self.times.add_argument(
@@ -345,6 +354,19 @@ class ArgParse:
                     )
 
         elif self.report_choice == "revenue":
+            if self.show_graph:
+                sold_list = SuperCsv().sold_list
+                if len(sold_list) <= 1:
+                    self.default_error_message("Not enough data.")
+                else:
+                    sold_list = SuperCsv().get_ordered_list()
+                    start_date = sold_list[0][3]
+                    end_date = sold_list[-1][3]
+                    values = [int(i[-1]) for i in sold_list]
+
+                    visual = SuperPlot(values, start_date, end_date)
+                    visual.plot()
+
             if self.today:
                 today = SuperDatetime().working_date
                 revenue = SuperCsv().get_revenue(today, today)
@@ -422,6 +444,7 @@ class ArgParse:
         self.reset_date = args.reset_date
         self.see_date = args.see_date
         self.set_date = args.set_date
+        self.show_graph = args.show_graph
         self.start_date = args.start_date
         self.today = args.today
         self.yesterday = args.yesterday
