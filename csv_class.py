@@ -7,15 +7,19 @@ from datetime_class import SuperDatetime
 from datetime import datetime, timedelta
 from pathlib import Path
 
+from rich import print
+
 
 class SuperCsv:
     def __init__(self):
+        # use of pathlib to make sure the txt files are always found
         self.this_directory = Path.cwd()
         self.data_directory = Path(self.this_directory, "data")
         self.data_bought = Path(self.data_directory, "bought.csv")
         self.data_sold = Path(self.data_directory, "sold.csv")
         self.sold_list = self.get_sold_list()
 
+    # add to bought list
     def add_bought(self, name, count, date, price, exp):
         with open(self.data_bought, "r") as file:
             reader = csv.reader(file)
@@ -23,6 +27,15 @@ class SuperCsv:
         with open(self.data_bought, "a", newline="") as f:
             writer = csv.writer(f)
             writer.writerow([row_count - 1, name, count, date, price, exp])
+
+    def find_bought_id(self, product_name):
+        return_list = []
+        with open(self.data_bought, "r") as file:
+            reader = csv.reader(file)
+            for row in reader:
+                if product_name in row:
+                    return_list.append(row)
+            return return_list
 
     def get_count(self, id):
         with open(self.data_bought, "r") as file:
@@ -109,18 +122,18 @@ class SuperCsv:
 
         return revenue
 
-    def get_start_date(self):
-        pass
-
     def get_sold_list(self):
         return_list = []
         with open(self.data_sold, "r") as f:
             reader = csv.reader(f)
             for row in reader:
-                if row[0] == "id":
+                try:
+                    if row[0] == "id":
+                        continue
+                    else:
+                        return_list.append(row)
+                except IndexError:
                     continue
-                else:
-                    return_list.append(row)
         return return_list
 
     def is_file_empty(self, file):
@@ -146,14 +159,7 @@ class SuperCsv:
 
         self.update_row(bought_id, count)
 
-    def find_bought_id(self, product_name):
-        return_list = []
-        with open(self.data_bought, "r") as file:
-            reader = csv.reader(file)
-            for row in reader:
-                if product_name in row:
-                    return_list.append(row)
-            return return_list
+    # make changes within a csv
 
     def update_row(self, id, count):
         temp = tempfile.NamedTemporaryFile(mode="w", delete=False, newline="")

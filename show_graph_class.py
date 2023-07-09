@@ -17,16 +17,12 @@ class SuperPlot:
         # Generate the list of dates
         dates = [self.start_date + increment * i for i in range(num_dates)]
 
-        # Convert dates to Matplotlib-compatible format
         formated_dates = [date.strftime("%Y-%m-%d") for date in dates]
 
-        # Create the plot
         plt.plot_date(formated_dates, self.values, linestyle="-")
 
-        # Rotate the x-axis tick labels
         plt.xticks(rotation=45)
 
-        # Adjust the padding/margins of the plot screen
         plt.subplots_adjust(bottom=0.4)
 
         plt.title("SuperPy")

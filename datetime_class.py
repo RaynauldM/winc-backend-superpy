@@ -13,6 +13,7 @@ class SuperDatetime:
 
         self.set_date(new_date.strftime("%Y-%m-%d"))
 
+    # get current working date
     def get_date(self):
         with open("data/date.txt", "r") as file:
             content = file.read()

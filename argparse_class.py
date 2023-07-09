@@ -131,6 +131,13 @@ class ArgParse:
         )
 
         self.optionals.add_argument(
+            "-s",
+            "--sold",
+            action="store_true",
+            help="Show the sold list instead of bought list",
+        )
+
+        self.optionals.add_argument(
             "-stard",
             "--start_date",
             default="default",
@@ -266,7 +273,7 @@ class ArgParse:
                 sys.exit()
 
     def default_error_message(self, text="[red]Error[/red], something went wrong"):
-        print(text + "\nplease try again")
+        print(f"[bold red]{text}[/bold red]" + "\nplease try again")
         input("")
         sys.exit()
 
@@ -275,12 +282,18 @@ class ArgParse:
             f"the working date is: [underline]{SuperDatetime().get_date()}[/underline]"
         )
 
-    # designated print of inventory
+    # designated print, shows expiration date in red if it exceeds the working date
     def super_print(self, list):
+        today = SuperDatetime().get_date()
         for item in list:
-            print(
-                f"\nid: {item[0]}\nproduct: [bold underline]{item[1]}[/bold underline]\ncount: {item[2]}\nbuy date: {item[3]}\nbuy price: {item[4]}\nexpiration: {item[5]}\n \n"
-            )
+            if item[5] < today:
+                print(
+                    f"\nid: {item[0]}\nproduct: [bold underline]{item[1]}[/bold underline]\ncount: {item[2]}\nbuy date: {item[3]}\nbuy price: {item[4]}\n[red bold]expiration: {item[5]}[/red bold]\n \n"
+                )
+            else:
+                print(
+                    f"\nid: {item[0]}\nproduct: [bold underline]{item[1]}[/bold underline]\ncount: {item[2]}\nbuy date: {item[3]}\nbuy price: {item[4]}\nexpiration: {item[5]}\n \n"
+                )
 
     # methods for the choice argument
 
@@ -335,6 +348,23 @@ class ArgParse:
                 "Please provide a second argument after [report].\nThe arguments you can choose are [inventory], [revenue] or [profit]."
             )
         elif self.report_choice == "inventory":
+            if self.sold:
+                sold_list = SuperCsv().get_sold_list()
+                bought_list = SuperCsv().get_inventory()
+                for sold_item in sold_list:
+                    bought_id = sold_item[1]
+
+                    product_name = None
+                    for bought_item in bought_list:
+                        if bought_item[0] == bought_id:
+                            product_name = bought_item[1]
+                            break
+
+                    if product_name is not None:
+                        print(
+                            f"{sold_item[2]} {product_name} was sold on {sold_item[-2]} for {sold_item[-1]} dollars"
+                        )
+
             if self.today:
                 inventory = SuperCsv().get_inventory()
                 if len(inventory) == 0:
@@ -343,7 +373,10 @@ class ArgParse:
                     self.super_print(inventory)
             if self.yesterday:
                 inventory = SuperCsv().get_inventory_yesterday()
-                self.super_print(inventory)
+                if len(inventory) == 0:
+                    self.default_error_message("Empty inventory for this day")
+                else:
+                    self.super_print(inventory)
             if self.set_date != "default":
                 try:
                     setted_date = self.set_date
@@ -445,6 +478,7 @@ class ArgParse:
         self.see_date = args.see_date
         self.set_date = args.set_date
         self.show_graph = args.show_graph
+        self.sold = args.sold
         self.start_date = args.start_date
         self.today = args.today
         self.yesterday = args.yesterday
