@@ -18,8 +18,8 @@ exp_date = "2060-11"
 # these tests are to make sure that after a change the program still works as intended
 
 
-def test_checkArgument():
-    assert ArgParse().checkArgument("choice", "hello") == "choice"
+def test_check_argument():
+    assert ArgParse().check_argument("choice", "hello") == "choice"
 
 
 def test_check_count():

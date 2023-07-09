@@ -138,7 +138,7 @@ class ArgParse:
         )
 
         self.optionals.add_argument(
-            "-stard",
+            "-start",
             "--start_date",
             default="default",
             help="starting date for choose_parameter argument",
@@ -158,27 +158,25 @@ class ArgParse:
         )
 
     # custom check to see if arguments are valid, a bit redundant probably
-    def checkArgument(self, var, string):
+    def check_argument(self, var, string):
         if var is None or var == "":
             var = input(f"Please enter a {string}:\n")
         if var is None or var == "":
             self.default_error_message("could not compute, please try again")
         return var
 
+    # check if count argument is posible
     def check_count(self):
         self.check_if_int(self.count)
         if len(self.id_list) > 1:
             if (float(self.id_list[2]) - float(self.count)) < 0:
-                self.default_error_message(
-                    "This will bring us out of stock! Please try again"
-                )
+                self.default_error_message("This will bring us out of stock!")
         else:
             if (float(self.id_list[0][2]) - float(self.count)) < 0:
-                self.default_error_message(
-                    "This will bring us out of stock! Please try again"
-                )
+                self.default_error_message("This will bring us out of stock!")
         return True
 
+    # check if expiration date is possible
     def check_expiration_date(self):
         ex_list = list(self.expiration_date)
         expiration_year = ex_list[0] + ex_list[1] + ex_list[2] + ex_list[3]
@@ -235,6 +233,7 @@ class ArgParse:
     def getInput(self, text):
         return input(text)
 
+    # will ask the user one last confirmation before writing to csv file
     def conformation(self, buy_or_sell):
         if buy_or_sell == "buy":
             yes_input = self.getInput(
@@ -298,24 +297,22 @@ class ArgParse:
     # methods for the choice argument
 
     def buy(self):
-        self.product_name = self.checkArgument(
+        self.product_name = self.check_argument(
             self.product_name, "product name with underscore between words"
         )
         self.check_product_name()
-        self.count = self.checkArgument(
+        self.count = self.check_argument(
             self.count, f"number of how many of {self.product_name} will be bought"
         )
         self.check_if_int(self.count)
-        self.price = self.checkArgument(self.price, "price")
+        self.price = self.check_argument(self.price, "price")
         self.check_if_int(self.price)
-        self.expiration_date = self.checkArgument(
+        self.expiration_date = self.check_argument(
             self.expiration_date, "expiration date [yyyy] or [yyyy-mm]"
         )
 
         self.check_if_int(self.expiration_date)
         self.check_expiration_date()
-        if self.choice == "test":
-            return True
         self.conformation("buy")
 
     def no_choice(self):
@@ -345,7 +342,7 @@ class ArgParse:
     def report(self):
         if self.report_choice == "no_report_choice":
             self.default_error_message(
-                "Please provide a second argument after [report].\nThe arguments you can choose are [inventory], [revenue] or [profit]."
+                "Please provide a second argument after report.\nThe arguments you can choose are inventory, revenue or profit."
             )
         elif self.report_choice == "inventory":
             if self.sold:
@@ -395,7 +392,7 @@ class ArgParse:
                     sold_list = SuperCsv().get_ordered_list()
                     start_date = sold_list[0][3]
                     end_date = sold_list[-1][3]
-                    values = [int(i[-1]) for i in sold_list]
+                    values = [float(i[-1]) for i in sold_list]
 
                     visual = SuperPlot(values, start_date, end_date)
                     visual.plot()
@@ -447,15 +444,15 @@ class ArgParse:
                 )
 
     def sell(self):
-        self.product_name = self.checkArgument(
+        self.product_name = self.check_argument(
             self.product_name, "product name with underscore between words"
         )
         self.check_product_name()
-        self.count = self.checkArgument(
+        self.count = self.check_argument(
             self.count, f"number of how many of {self.product_name} will be sold"
         )
         self.check_count()
-        self.price = self.checkArgument(self.price, "price")
+        self.price = self.check_argument(self.price, "price")
         self.check_if_int(self.price)
         if self.choice == "test":
             return True

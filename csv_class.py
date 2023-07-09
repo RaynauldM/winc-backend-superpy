@@ -1,7 +1,9 @@
 import csv
+import random
 import shutil
 import sys
 import tempfile
+
 
 from datetime_class import SuperDatetime
 from datetime import datetime, timedelta
@@ -21,12 +23,14 @@ class SuperCsv:
 
     # add to bought list
     def add_bought(self, name, count, date, price, exp):
+        id_count = 0
         with open(self.data_bought, "r") as file:
             reader = csv.reader(file)
-            row_count = len(list(reader))
+            id_count = len(list(reader)) - 1
+
         with open(self.data_bought, "a", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow([row_count - 1, name, count, date, price, exp])
+            writer.writerow([id_count, name, count, date, price, exp])
 
     def find_bought_id(self, product_name):
         return_list = []
