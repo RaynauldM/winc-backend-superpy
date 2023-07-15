@@ -47,6 +47,9 @@ Example: python super.py -rd
 [-see], [--see-date]: View the current working date. 
 Example: python super.py -see
 
+[-set], [--set_date]: Set the working date in format yyyy-mm-dd.
+Example: python super.py -set 2024-05-01
+
 [-sg], [--show-graph]: Show revenue in a visual form. 
 Example: python super.py report revenue -sg
 

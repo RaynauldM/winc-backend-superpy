@@ -88,8 +88,7 @@ class SuperCsv:
         end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
         if self.is_file_empty(self.data_bought) is True:
             print("[red]nothing bought yet[/red]")
-            input("")
-            sys.exit()
+
         with open(self.data_bought, "r") as f:
             reader = csv.reader(f)
             for row in reader:
@@ -110,8 +109,7 @@ class SuperCsv:
         end_datetime = datetime.strptime(end_date, "%Y-%m-%d")
         if self.is_file_empty(self.data_sold) is True:
             print("[red]nothing sold yet[/red]")
-            input("")
-            sys.exit()
+
         with open(self.data_sold, "r") as f:
             reader = csv.reader(f)
             for row in reader:

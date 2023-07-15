@@ -251,8 +251,6 @@ class ArgParse:
                 print("[green]ok, written to the harddrive[/green]")
             else:
                 print("[red]No data saved.[/red] \nPress enter to exit")
-                input("")
-                sys.exit()
 
         elif buy_or_sell == "sell":
             yes_input = input(
@@ -268,13 +266,9 @@ class ArgParse:
                 print("[green]ok, written to the harddrive.[/green]")
             else:
                 print("[red]No data saved.[/red] \nPress enter to exit")
-                input("")
-                sys.exit()
 
     def default_error_message(self, text="[red]Error[/red], something went wrong"):
         print(f"[bold red]{text}[/bold red]" + "\nplease try again")
-        input("")
-        sys.exit()
 
     def print_working_date(self):
         print(
@@ -318,24 +312,20 @@ class ArgParse:
     def no_choice(self):
         if self.see_date is True:
             self.print_working_date()
-            input("")
-            sys.exit()
+
         if self.reset_date is True:
             SuperDatetime().set_date()
             print(f"[blue]Changed date to [/blue]{SuperDatetime().get_datetime()}")
-            input("")
-            sys.exit()
 
         if self.advance_time > 0:
             SuperDatetime().advance_date(self.advance_time)
             print("[blue]Advanced the date![/blue]")
-            sys.exit()
 
         if self.set_date != "default":
             if self.check_if_int(self.set_date):
                 SuperDatetime().set_date(self.set_date)
                 print("[blue]updated the date![/blue]")
-                sys.exit()
+
             else:
                 self.default_error_message("invalid input for setting the date")
 
