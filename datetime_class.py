@@ -26,6 +26,14 @@ class SuperDatetime:
     def get_datetime(self):
         return self.dt.strftime("%Y-%m-%d")
 
+    def get_month(self):
+        return_month = ""
+        li = list(self.working_date)
+        return_month += li[5]
+        return_month += li[6]
+
+        return return_month
+
     def get_year(self):
         return_year = ""
         li = list(self.working_date)

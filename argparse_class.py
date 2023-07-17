@@ -7,6 +7,7 @@ from datetime_class import SuperDatetime
 from rich import print
 from show_graph_class import SuperPlot
 
+
 choice_help_message = """
 [buy] buy product,
 [sell] sell product,
@@ -180,9 +181,15 @@ class ArgParse:
     def check_expiration_date(self):
         ex_list = list(self.expiration_date)
         expiration_year = ex_list[0] + ex_list[1] + ex_list[2] + ex_list[3]
+        expiration_month = ex_list[5] + ex_list[6]
         this_year = SuperDatetime().get_year()
+        this_month = SuperDatetime().get_month()
         if int(expiration_year) < int(this_year):
             self.default_error_message("expiration year has already passed")
+
+        elif int(expiration_month) < int(this_month):
+            self.default_error_message("expiration date has already passed")
+
         if len(self.expiration_date) == 4:
             self.expiration_date += "-01"
         elif "-" not in self.expiration_date:
@@ -269,6 +276,7 @@ class ArgParse:
 
     def default_error_message(self, text="[red]Error[/red], something went wrong"):
         print(f"[bold red]{text}[/bold red]" + "\nplease try again")
+        sys.exit()
 
     def print_working_date(self):
         print(
